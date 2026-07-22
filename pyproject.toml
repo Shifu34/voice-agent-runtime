@@ -1,6 +1,6 @@
 [project]
 name = "voice-agent-runtime"
-version = "0.1.0"
+version = "0.1.1"
 description = "Reusable voice agent runtime for Healix LiveKit agents (STT routing, language state, handoff)"
 readme = "README.md"
 requires-python = ">=3.11"
