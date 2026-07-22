@@ -176,6 +176,9 @@ def test_intentional_urdu_patient_name_request():
     assert reply_in_urdu(state, "شفقت محمود سے سٹارٹ کرتے ہیں") is True
     assert looks_like_phonetic_english_in_urdu_script("شفقت محمود سے شروع کر لیں") is False
     assert reply_in_urdu(state, "شفقت محمود سے شروع کر لیں") is True
+    assert looks_like_phonetic_english_in_urdu_script("ہیلو نورا کیا میرے کوئی پینڈنگ انکاؤنٹرز ہیں") is False
+    assert looks_like_phonetic_english_in_urdu_script("میں نے یہی بولا کہ بریفنگ دو مجھے") is False
+    assert looks_like_phonetic_english_in_urdu_script("ہیلو نورا ہے ایک پینڈنگ کانٹرز ہے؟") is True
     print("[PASS] test_intentional_urdu_patient_name_request")
 
 

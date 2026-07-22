@@ -138,6 +138,23 @@ def looks_like_phonetic_english_in_urdu_script(text: str) -> bool:
     if "شروع" in text and "کر" in text:
         return False
 
+    # Pakistani Urdu: Urdu grammar + English hospital words in Urdu script
+    # (پینڈنگ، بریفنگ، appointment) — not English spoken as phonetics.
+    _real_urdu_markers = (
+        "میں", "مجھے", "کیا", "میرے", "کریں", "دوں", "دو", "دیں", "بتاؤ",
+        "ہیں", "ہے", "کوئی", "نا", "کہ", "یہی", "بولا", "پہ", "سے",
+        "ایسا", "پہلی", "مجھ", "ہو", "جی", "کرتے", "کرنا",
+    )
+    _real_hits = 0
+    for _m in _real_urdu_markers:
+        if len(_m) <= 3:
+            if _urdu_token_in_text(_m, text):
+                _real_hits += 1
+        elif _m in text:
+            _real_hits += 1
+    if _real_hits >= 3:
+        return False
+
     # "Let's start with Shafqat" / "start with first one" (English phonetics)
     if _START_WITH_PHONETIC_RE.search(text):
         return True
