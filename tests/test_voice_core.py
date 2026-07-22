@@ -174,6 +174,8 @@ def test_intentional_urdu_patient_name_request():
     assert reply_in_urdu(state, text) is True
     assert reply_in_urdu(state, "ہنجی دے دیں") is True
     assert reply_in_urdu(state, "شفقت محمود سے سٹارٹ کرتے ہیں") is True
+    assert looks_like_phonetic_english_in_urdu_script("شفقت محمود سے شروع کر لیں") is False
+    assert reply_in_urdu(state, "شفقت محمود سے شروع کر لیں") is True
     print("[PASS] test_intentional_urdu_patient_name_request")
 
 
@@ -190,6 +192,26 @@ def test_clear_english_beats_garbled_urdu_hold():
     assert lang == "en"
     assert "first" in text.lower() or "start" in text.lower()
     print("[PASS] test_clear_english_beats_garbled_urdu_hold")
+
+
+def test_lets_start_with_first_one_accepted_as_english():
+    """Short clinical selection must not be discarded by the STT router."""
+    from voice_agent_runtime.scoring import looks_like_english_stt, pick_language
+
+    phrase = "let's start with the first one"
+    assert looks_like_english_stt(phrase) is True
+    en = {
+        "text": phrase,
+        "segments": [{"avg_logprob": -0.35, "no_speech_prob": 0.08}],
+    }
+    ur = {
+        "text": "",
+        "segments": [{"avg_logprob": -2.0, "no_speech_prob": 0.6}],
+    }
+    lang, text = pick_language(en, ur, current_language="en")
+    assert lang == "en"
+    assert "first" in text.lower()
+    print("[PASS] test_lets_start_with_first_one_accepted_as_english")
 
 
 def test_partial_lets_start_with_keeps_urdu_session():
@@ -274,6 +296,7 @@ def main():
         test_phonetic_lets_start_with_patient,
         test_intentional_urdu_patient_name_request,
         test_clear_english_beats_garbled_urdu_hold,
+        test_lets_start_with_first_one_accepted_as_english,
         test_partial_lets_start_with_keeps_urdu_session,
         test_apply_transcript_follows_urdu_router,
         test_workflow_english_keeps_urdu_session,

@@ -49,8 +49,20 @@ _ENGLISH_WORDS_RE = re.compile(
     r"stomach|chest|back|neck|arm|leg|eye|ear|nose|throat|skin|"
     r"blood|pressure|sugar|test|report|check|up|down|out|good|bad|"
     r"better|worse|okay|ok|sure|right|left|morning|evening|night|"
-    r"day|week|month|year|time|date|name|age|phone|number|address)\b",
+    r"day|week|month|year|time|date|name|age|phone|number|address|"
+    r"start|starts|started|let|lets|with|first|second|third|one|two|"
+    r"three|four|five|give|brief|briefing|encounter|patient|pending|"
+    r"details|next|pick|choose|select|think|should|would|could|said)\b",
     re.IGNORECASE,
+)
+
+# Common doctor selection commands — short but valid English even when
+# Whisper confidence is borderline (e.g. "let's start with the first one").
+_CLINICAL_SELECTION_RE = re.compile(
+    r"(?i)\b(?:let'?s|lets)\s+start\s+with\b"
+    r"|\bstart\s+with\b"
+    r"|\b(?:first|second|third)\s+(?:one|patient|appointment)\b"
+    r"|\b(?:yes|yeah|yep),?\s*(?:start|please)\b",
 )
 
 _HALLUCINATION_PATTERNS = (
@@ -117,7 +129,9 @@ def looks_like_english_stt(text: str) -> bool:
         return False
     if looks_like_roman_urdu_stt(text):
         return False
-    if len(text) < 30:
+    if _CLINICAL_SELECTION_RE.search(text):
+        return True
+    if len(text) < 40:
         return bool(_ENGLISH_WORDS_RE.search(text))
     return english_word_count(text) >= 2
 

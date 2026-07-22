@@ -77,7 +77,7 @@ _PHONETIC_EN_URDU_TOKENS: tuple[str, ...] = (
     "بریفنگ", "گریفنگ", "پینڈنگ", "شیڈول", "سٹارٹ", "گیٹ", "میٹ", "ویس", "ود",
     "ففٹین", "سیکسٹین", "سیونٹین", "نوجیا", "نازیا", "ناسیا", "یس", "نو",
     "پیشنٹ", "پیشنت", "نیم", "نیمز", "نیمس", "ٹیل", "مے",
-    "شفک", "شفقت", "محمود", "مہمود", "عبداللہ", "اسد",
+    "شفک",
 )
 
 _DOMAIN_PHONETIC_MARKERS: tuple[str, ...] = (
@@ -128,10 +128,14 @@ def looks_like_phonetic_english_in_urdu_script(text: str) -> bool:
     ):
         return False
 
-    # Real Urdu: "شفقت محمود سے سٹارٹ کرتے ہیں"
+    # Real Urdu patient/action framing — not phonetic English
+    # e.g. "شفقت محمود سے سٹارٹ کرتے ہیں", "شفقت محمود سے شروع کر لیں"
     if ("سے" in text or "کو" in text) and any(
-        v in text for v in ("کرتے", "کرتے", "کریں", "کرنا", "کرتی")
+        v in text
+        for v in ("کرتے", "کریں", "کرنا", "کرتی", "شروع", "لیں", "کر لیں")
     ):
+        return False
+    if "شروع" in text and "کر" in text:
         return False
 
     # "Let's start with Shafqat" / "start with first one" (English phonetics)
